@@ -28,41 +28,6 @@ dnf5 install -y \
 # Enable the display manager so it boots to KDE login
 systemctl enable sddm.service
 
-# # Nvidea
-# # --- Install NVIDIA (nvidia-open) drivers via ublue's prebuilt akmods ---
-#
-# # Kernel modules were pulled in from ghcr.io/ublue-os/akmods-nvidia-open
-# # in the Containerfile build stage and copied to /tmp/akmods-rpms
-# dnf5 install -y /tmp/akmods-rpms/kmods/*.rpm
-#
-# # Enable negativo17's nvidia repo for the matching userspace driver packages
-# # (akmods only ships the kernel module; userspace libs come from here)
-# cat <<'EOF' > /etc/yum.repos.d/negativo17-nvidia.repo
-# [negativo17-nvidia]
-# name=negativo17 - nvidia
-# baseurl=https://negativo17.org/repos/fedora-nvidia/
-# enabled=1
-# gpgcheck=1
-# gpgkey=https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
-# EOF
-
-# dnf5 install -y nvidia-driver nvidia-driver-libs nvidia-driver-cuda nvidia-settings
-#
-# rm /etc/yum.repos.d/negativo17-nvidia.repo
-# rm -rf /tmp/akmods-rpms
-#
-# # Blacklist nouveau and enable DRM modesetting via bootc kargs
-# # (this is the bootc-native way to set kernel args baked into the image,
-# # replacing the old grubby/kernelopts approach)
-# mkdir -p /usr/lib/bootc/kargs.d
-# cat <<'EOF' > /usr/lib/bootc/kargs.d/00-nvidia.toml
-# kargs = [
-#   "rd.driver.blacklist=nouveau",
-#   "modprobe.blacklist=nouveau",
-#   "nvidia-drm.modeset=1",
-# ]
-# EOF
-
 # Visual Studio Code
 
 # Import Microsoft's GPG key
@@ -93,6 +58,12 @@ gpgkey=https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
 EOF
 
 # --- Add Google Chrome repo ---
+
+# Import Google's GPG key (was missing — required since gpgcheck=1 below,
+# otherwise dnf5 either hangs on a prompt or fails signature verification
+# in a non-interactive build)
+rpm --import https://dl.google.com/linux/linux_signing_key.pub
+
 cat <<'EOF' > /etc/yum.repos.d/google-chrome.repo
 [google-chrome]
 name=google-chrome
@@ -102,20 +73,42 @@ gpgcheck=1
 gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF
 
-dnf install -y google-chrome-stable
+# Install browsers + fedora-repo packages in one dnf5 call
+# (fixed: brave-origin -> brave-browser; dnf -> dnf5 for consistency)
+dnf5 install -y \
+  mpv fastfetch zsh unzip \
+  code \
+  brave-origin \
+  google-chrome-stable
 
-# this installs a package from fedora repos
-dnf5 install -y mpv code brave-origin fastfetch zsh
+# Ghostty (COPR — not yet in Fedora main repos on this release)
+# fixed: dnf -> dnf5, and disable the COPR after install
+dnf5 -y copr enable scottames/ghostty
+dnf5 install -y ghostty
+dnf5 -y copr disable scottames/ghostty
 
-#Ghostty
-dnf -y copr enable scottames/ghostty
-dnf install -y ghostty
+# GCC / build tools
+dnf5 install -y \
+  gcc \
+  gcc-c++ \
+  make \
+  automake \
+  autoconf \
+  binutils \
+  bison \
+  flex \
+  gdb \
+  glibc-devel \
+  libtool \
+  pkgconf \
+  pkgconf-pkg-config \
+  redhat-rpm-config \
+  rpm-build \
+  patch \
+  ccache
 
-#GCC
-dnf5 group install -y "Development Tools"
-
-#LLVM
-dnf install -y llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel clang-devel
+# LLVM (fixed: dnf -> dnf5)
+dnf5 install -y llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel clang-devel
 
 # --- Install Zen Browser (official binary release, no repo/COPR needed) ---
 
@@ -167,9 +160,6 @@ rm /tmp/jetbrains-toolbox.tar.gz
 ln -sf /opt/jetbrains-toolbox/jetbrains-toolbox /usr/bin/jetbrains-toolbox
 
 # Desktop entry so it shows up in the KDE app launcher
-# Note: Toolbox normally self-registers a .desktop file in ~/.local/share/applications
-# on first run, but since this is a system image (not a live user session),
-# we provide one system-wide instead so it's visible immediately after boot
 cat <<'EOF' > /usr/share/applications/jetbrains-toolbox.desktop
 [Desktop Entry]
 Name=JetBrains Toolbox
@@ -182,8 +172,8 @@ Categories=Development;
 StartupNotify=true
 EOF
 
-# Python
-sudo dnf install -y python3 python3-devel python3-pip python3-tkinter
+# Python (fixed: removed unnecessary/risky 'sudo' — build.sh already runs as root)
+dnf5 install -y python3 python3-devel python3-pip python3-tkinter
 
 # Distrobox
 dnf5 install -y distrobox
@@ -233,13 +223,6 @@ dnf5 install -y \
 
 # Sound group upgrade (same pattern, for audio codec completeness)
 dnf5 group upgrade -y sound-and-video
-
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
 
 #### Example for enabling a System Unit File
 
