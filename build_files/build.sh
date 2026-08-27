@@ -156,20 +156,20 @@ dnf5 install -y terra-release
 dnf5 install -y jetbrainsmono-nerd-fonts
 
 # RPM-Fusion
-dnf install \
+dnf install -y \
  https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 
- dnf install \
+ dnf install -y \
  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 # Multimedia Codecs
-dnf install @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+dnf install -y @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
 
-dnf install gstreamer1-plugin-openh264 mozilla-openh264
+dnf install -y gstreamer1-plugin-openh264 mozilla-openh264
 
-dnf swap ffmpeg-free ffmpeg --allowerasing
+dnf swap ffmpeg-free ffmpeg --allowerasing -y
 
-dnf install intel-media-driver
+dnf install -y intel-media-driver
 
 #### Example for enabling a System Unit File
 
