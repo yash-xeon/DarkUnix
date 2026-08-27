@@ -114,11 +114,6 @@ dnf5 install -y llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel c
 # Ensure Flathub remote is configured system-wide (for first-boot Zen install)
 flatpak remote-add --if-not-exists --system flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# Enable first-boot Flatpak install of Zen Browser
-systemctl enable zen-flatpak-setup.service
-
-
-
 # --- Install JetBrains Toolbox (official binary, no repo available) ---
 
 curl -Lfo /tmp/jetbrains-toolbox.tar.gz "https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"
@@ -155,22 +150,7 @@ dnf5 install -y emacs git ripgrep fd-find
 
 # --- Install JetBrainsMono Nerd Font ---
 
-NERD_FONT_VERSION=$(curl -s https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | grep '"tag_name"' | cut -d '"' -f4)
-
-if [ -z "$NERD_FONT_VERSION" ]; then
-  echo "ERROR: Failed to resolve latest Nerd Fonts version (GitHub API rate-limited or unreachable)"
-  exit 1
-fi
-
-curl -Lfo /tmp/JetBrainsMono.zip "https://github.com/ryanoasis/nerd-fonts/releases/download/${NERD_FONT_VERSION}/JetBrainsMono.zip"
-
-mkdir -p /usr/share/fonts/jetbrainsmono-nerd-font
-unzip -o /tmp/JetBrainsMono.zip -d /usr/share/fonts/jetbrainsmono-nerd-font
-rm /tmp/JetBrainsMono.zip
-
-find /usr/share/fonts/jetbrainsmono-nerd-font -iname "*Windows Compatible*" -delete
-
-fc-cache -f
+dnf5 install -y jetbrainsmono-nerd-fonts
 
 # Multimedia Codecs
 # --- Multimedia codecs (RPM Fusion) ---
