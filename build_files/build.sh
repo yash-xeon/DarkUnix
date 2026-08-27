@@ -110,36 +110,14 @@ dnf5 install -y \
 # LLVM (fixed: dnf -> dnf5)
 dnf5 install -y llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel clang-devel
 
-# --- Install Zen Browser (official binary release, no repo/COPR needed) ---
+#Flatpak
+# Ensure Flathub remote is configured system-wide (for first-boot Zen install)
+flatpak remote-add --if-not-exists --system flathub https://flathub.org/repo/flathub.flatpakrepo
 
-ZEN_VERSION=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | grep '"tag_name"' | cut -d '"' -f4)
+# Enable first-boot Flatpak install of Zen Browser
+systemctl enable zen-flatpak-setup.service
 
-if [ -z "$ZEN_VERSION" ]; then
-  echo "ERROR: Failed to resolve latest Zen Browser version (GitHub API rate-limited or unreachable)"
-  exit 1
-fi
 
-curl -Lfo /tmp/zen.tar.bz2 "https://github.com/zen-browser/desktop/releases/download/${ZEN_VERSION}/zen.linux-x86_64.tar.bz2"
-
-mkdir -p /opt/zen-browser
-tar -xjf /tmp/zen.tar.bz2 -C /opt/zen-browser --strip-components=1
-rm /tmp/zen.tar.bz2
-
-ln -sf /opt/zen-browser/zen /usr/bin/zen
-
-cat <<'EOF' > /usr/share/applications/zen-browser.desktop
-[Desktop Entry]
-Name=Zen Browser
-Comment=Experience tranquillity while browsing the internet
-Exec=/opt/zen-browser/zen %u
-Icon=/opt/zen-browser/browser/chrome/icons/default/default128.png
-Terminal=false
-Type=Application
-MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
-Categories=Network;WebBrowser;
-StartupNotify=true
-StartupWMClass=zen
-EOF
 
 # --- Install JetBrains Toolbox (official binary, no repo available) ---
 
