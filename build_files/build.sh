@@ -155,12 +155,10 @@ dnf5 install -y terra-release
 
 dnf5 install -y jetbrainsmono-nerd-fonts
 
-# RPM-Fusion
-dnf install -y \
- https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-
- dnf install -y \
- https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+# --- Enable RPM Fusion (free + nonfree) ---
+dnf5 install -y \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 # Multimedia Codecs
 dnf install -y @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
