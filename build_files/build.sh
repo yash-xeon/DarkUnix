@@ -46,22 +46,22 @@ systemctl enable sddm.service
 # gpgkey=https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
 # EOF
 
-dnf5 install -y nvidia-driver nvidia-driver-libs nvidia-driver-cuda nvidia-settings
-
-rm /etc/yum.repos.d/negativo17-nvidia.repo
-rm -rf /tmp/akmods-rpms
-
-# Blacklist nouveau and enable DRM modesetting via bootc kargs
-# (this is the bootc-native way to set kernel args baked into the image,
-# replacing the old grubby/kernelopts approach)
-mkdir -p /usr/lib/bootc/kargs.d
-cat <<'EOF' > /usr/lib/bootc/kargs.d/00-nvidia.toml
-kargs = [
-  "rd.driver.blacklist=nouveau",
-  "modprobe.blacklist=nouveau",
-  "nvidia-drm.modeset=1",
-]
-EOF
+# dnf5 install -y nvidia-driver nvidia-driver-libs nvidia-driver-cuda nvidia-settings
+#
+# rm /etc/yum.repos.d/negativo17-nvidia.repo
+# rm -rf /tmp/akmods-rpms
+#
+# # Blacklist nouveau and enable DRM modesetting via bootc kargs
+# # (this is the bootc-native way to set kernel args baked into the image,
+# # replacing the old grubby/kernelopts approach)
+# mkdir -p /usr/lib/bootc/kargs.d
+# cat <<'EOF' > /usr/lib/bootc/kargs.d/00-nvidia.toml
+# kargs = [
+#   "rd.driver.blacklist=nouveau",
+#   "modprobe.blacklist=nouveau",
+#   "nvidia-drm.modeset=1",
+# ]
+# EOF
 
 # Visual Studio Code
 
@@ -212,6 +212,27 @@ find /usr/share/fonts/jetbrainsmono-nerd-font -iname "*Windows Compatible*" -del
 
 # Rebuild the font cache so the fonts are immediately available
 fc-cache -f
+
+# Multimedia Codecs
+# --- Multimedia codecs (RPM Fusion) ---
+
+# Swap Fedora's patent-restricted ffmpeg-free for RPM Fusion's full ffmpeg
+dnf5 swap -y ffmpeg-free ffmpeg --allowerasing
+
+# Upgrade multimedia group to pull in full codec support (excludes GStreamer's
+# own limited plugin sets that ship in the base group)
+dnf5 group upgrade -y multimedia --setopt="install_weak_deps=False" \
+  --exclude="PackageKit-gstreamer-plugin" --exclude="gstreamer1-plugins-bad-free-gtk" --exclude="gstreamer1-plugins-bad-free-fluidsynth"
+
+# Full GStreamer plugin sets (good/bad/ugly + libav) for broad format support
+dnf5 install -y \
+  gstreamer1-plugins-{bad-\*,good-\*,base} \
+  gstreamer1-plugin-openh264 \
+  gstreamer1-libav \
+  --exclude=gstreamer1-plugins-bad-free-devel
+
+# Sound group upgrade (same pattern, for audio codec completeness)
+dnf5 group upgrade -y sound-and-video
 
 # Use a COPR Example:
 #
