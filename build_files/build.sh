@@ -155,19 +155,7 @@ dnf5 install -y terra-release
 
 dnf5 install -y jetbrainsmono-nerd-fonts
 
-# --- Enable RPM Fusion (free + nonfree) ---
-dnf5 install -y \
-  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-
-# Multimedia Codecs
-dnf install -y @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
-
-dnf install -y gstreamer1-plugin-openh264 mozilla-openh264
-
-dnf swap ffmpeg-free ffmpeg --allowerasing -y
-
-dnf install -y intel-media-driver
+rpm -q ffmpeg
 
 #### Example for enabling a System Unit File
 
