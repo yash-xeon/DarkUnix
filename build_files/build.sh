@@ -103,7 +103,11 @@ gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF
 
 # this installs a package from fedora repos
-dnf5 install -y ghostty mpv code brave-origin google-chrome-stable fastfetch zsh
+dnf5 install -y mpv code brave-origin google-chrome-stable fastfetch zsh
+
+#Ghostty
+dnf copr enable scottames/ghostty
+dnf install ghostty
 
 #GCC
 dnf groupinstall "Development Tools"
