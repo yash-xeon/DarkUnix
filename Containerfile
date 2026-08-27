@@ -2,8 +2,6 @@
 FROM scratch AS ctx
 COPY build_files /
 COPY system_files /system_files
-# Pull in ublue's prebuilt Homebrew system files (systemd units + install script)
-COPY --from=ghcr.io/ublue-os/brew:latest /system_files /
 
 # ... your existing COPY/RUN lines, including the build.sh invocation ...
 

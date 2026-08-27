@@ -102,18 +102,20 @@ gpgcheck=1
 gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF
 
+dnf install -y google-chrome-stable
+
 # this installs a package from fedora repos
-dnf5 install -y mpv code brave-origin google-chrome-stable fastfetch zsh
+dnf5 install -y mpv code brave-origin fastfetch zsh
 
 #Ghostty
 dnf copr enable scottames/ghostty
-dnf install ghostty
+dnf install -y ghostty
 
 #GCC
-dnf groupinstall "Development Tools"
+dnf groupinstall -y "Development Tools"
 
 #LLVM
-dnf install llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel clang-devel
+dnf install -y llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel clang-devel
 
 # --- Install Zen Browser (official binary release, no repo/COPR needed) ---
 
@@ -185,12 +187,6 @@ sudo dnf install python3 python3-devel python3-pip python3-tkinter
 
 # Distrobox
 dnf5 install -y distrobox
-
-# Homebrew
-# --- Enable Homebrew (installed on first boot via ublue's brew-setup.service) ---
-# Actual installation happens at first boot, not build time — see Bluefin's
-# ghcr.io/ublue-os/brew image, copied in via the Containerfile
-systemctl enable brew-setup.service
 
 # Doom Emacs
 # --- Install Emacs + Doom Emacs dependencies ---
