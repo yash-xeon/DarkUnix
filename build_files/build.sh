@@ -149,6 +149,9 @@ dnf5 install -y distrobox
 dnf5 install -y emacs git ripgrep fd-find
 
 # --- Install JetBrainsMono Nerd Font ---
+curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo -o /etc/yum.repos.d/terra.repo
+
+dnf5 install -y terra-release
 
 dnf5 install -y jetbrainsmono-nerd-fonts
 
