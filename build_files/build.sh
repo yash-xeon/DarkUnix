@@ -112,7 +112,7 @@ dnf -y copr enable scottames/ghostty
 dnf install -y ghostty
 
 #GCC
-dnf groupinstall -y "Development Tools"
+dnf5 group install -y "Development Tools"
 
 #LLVM
 dnf install -y llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel clang-devel
