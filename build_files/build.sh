@@ -108,7 +108,7 @@ dnf install -y google-chrome-stable
 dnf5 install -y mpv code brave-origin fastfetch zsh
 
 #Ghostty
-dnf copr enable scottames/ghostty
+dnf -y copr enable scottames/ghostty
 dnf install -y ghostty
 
 #GCC
