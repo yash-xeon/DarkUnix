@@ -155,26 +155,21 @@ dnf5 install -y terra-release
 
 dnf5 install -y jetbrainsmono-nerd-fonts
 
+# RPM-Fusion
+dnf install \
+ https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+
+ dnf install \
+ https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
 # Multimedia Codecs
-# --- Multimedia codecs (RPM Fusion) ---
+dnf install @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
 
-# Swap Fedora's patent-restricted ffmpeg-free for RPM Fusion's full ffmpeg
-dnf5 swap -y ffmpeg-free ffmpeg --allowerasing
+dnf install gstreamer1-plugin-openh264 mozilla-openh264
 
-# Upgrade multimedia group to pull in full codec support (excludes GStreamer's
-# own limited plugin sets that ship in the base group)
-dnf5 group upgrade -y multimedia --setopt="install_weak_deps=False" \
-  --exclude="PackageKit-gstreamer-plugin" --exclude="gstreamer1-plugins-bad-free-gtk" --exclude="gstreamer1-plugins-bad-free-fluidsynth"
+dnf swap ffmpeg-free ffmpeg --allowerasing
 
-# Full GStreamer plugin sets (good/bad/ugly + libav) for broad format support
-dnf5 install -y \
-  gstreamer1-plugins-{bad-\*,good-\*,base} \
-  gstreamer1-plugin-openh264 \
-  gstreamer1-libav \
-  --exclude=gstreamer1-plugins-bad-free-devel
-
-# Sound group upgrade (same pattern, for audio codec completeness)
-dnf5 group upgrade -y sound-and-video
+dnf install intel-media-driver
 
 #### Example for enabling a System Unit File
 
