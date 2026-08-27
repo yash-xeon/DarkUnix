@@ -28,23 +28,23 @@ dnf5 install -y \
 # Enable the display manager so it boots to KDE login
 systemctl enable sddm.service
 
-# Nvidea
-# --- Install NVIDIA (nvidia-open) drivers via ublue's prebuilt akmods ---
-
-# Kernel modules were pulled in from ghcr.io/ublue-os/akmods-nvidia-open
-# in the Containerfile build stage and copied to /tmp/akmods-rpms
-dnf5 install -y /tmp/akmods-rpms/kmods/*.rpm
-
-# Enable negativo17's nvidia repo for the matching userspace driver packages
-# (akmods only ships the kernel module; userspace libs come from here)
-cat <<'EOF' > /etc/yum.repos.d/negativo17-nvidia.repo
-[negativo17-nvidia]
-name=negativo17 - nvidia
-baseurl=https://negativo17.org/repos/fedora-nvidia/
-enabled=1
-gpgcheck=1
-gpgkey=https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
-EOF
+# # Nvidea
+# # --- Install NVIDIA (nvidia-open) drivers via ublue's prebuilt akmods ---
+#
+# # Kernel modules were pulled in from ghcr.io/ublue-os/akmods-nvidia-open
+# # in the Containerfile build stage and copied to /tmp/akmods-rpms
+# dnf5 install -y /tmp/akmods-rpms/kmods/*.rpm
+#
+# # Enable negativo17's nvidia repo for the matching userspace driver packages
+# # (akmods only ships the kernel module; userspace libs come from here)
+# cat <<'EOF' > /etc/yum.repos.d/negativo17-nvidia.repo
+# [negativo17-nvidia]
+# name=negativo17 - nvidia
+# baseurl=https://negativo17.org/repos/fedora-nvidia/
+# enabled=1
+# gpgcheck=1
+# gpgkey=https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
+# EOF
 
 dnf5 install -y nvidia-driver nvidia-driver-libs nvidia-driver-cuda nvidia-settings
 
