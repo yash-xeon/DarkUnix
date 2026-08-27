@@ -112,24 +112,21 @@ dnf5 install -y llvm clang lld lldb compiler-rt libomp libomp-devel llvm-devel c
 
 # --- Install Zen Browser (official binary release, no repo/COPR needed) ---
 
-# Zen doesn't publish an RPM repo, so we fetch the latest release tag
-# directly from GitHub's API instead of hardcoding a version number
 ZEN_VERSION=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | grep '"tag_name"' | cut -d '"' -f4)
 
-# Download the official prebuilt tarball for that version
-curl -Lo /tmp/zen.tar.bz2 "https://github.com/zen-browser/desktop/releases/download/${ZEN_VERSION}/zen.linux-x86_64.tar.bz2"
+if [ -z "$ZEN_VERSION" ]; then
+  echo "ERROR: Failed to resolve latest Zen Browser version (GitHub API rate-limited or unreachable)"
+  exit 1
+fi
 
-# Extract into /opt (standard location for self-contained third-party apps)
-# --strip-components=1 drops the top-level folder from the tarball
+curl -Lfo /tmp/zen.tar.bz2 "https://github.com/zen-browser/desktop/releases/download/${ZEN_VERSION}/zen.linux-x86_64.tar.bz2"
+
 mkdir -p /opt/zen-browser
 tar -xjf /tmp/zen.tar.bz2 -C /opt/zen-browser --strip-components=1
 rm /tmp/zen.tar.bz2
 
-# Symlink the binary onto PATH so 'zen' works from a terminal
 ln -sf /opt/zen-browser/zen /usr/bin/zen
 
-# Desktop entry so it shows up in the KDE app launcher with an icon,
-# and registers as a handler for http/https links
 cat <<'EOF' > /usr/share/applications/zen-browser.desktop
 [Desktop Entry]
 Name=Zen Browser
@@ -146,20 +143,14 @@ EOF
 
 # --- Install JetBrains Toolbox (official binary, no repo available) ---
 
-# JetBrains doesn't publish an RPM for Toolbox. This URL always redirects
-# to the latest Linux build, so no version number needs to be hardcoded
-curl -Lo /tmp/jetbrains-toolbox.tar.gz "https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"
+curl -Lfo /tmp/jetbrains-toolbox.tar.gz "https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"
 
-# Extract into /opt (standard location for self-contained third-party apps)
-# --strip-components=1 drops the versioned top-level folder from the tarball
 mkdir -p /opt/jetbrains-toolbox
 tar -xzf /tmp/jetbrains-toolbox.tar.gz -C /opt/jetbrains-toolbox --strip-components=1
 rm /tmp/jetbrains-toolbox.tar.gz
 
-# Symlink the binary onto PATH so 'jetbrains-toolbox' works from a terminal
 ln -sf /opt/jetbrains-toolbox/jetbrains-toolbox /usr/bin/jetbrains-toolbox
 
-# Desktop entry so it shows up in the KDE app launcher
 cat <<'EOF' > /usr/share/applications/jetbrains-toolbox.desktop
 [Desktop Entry]
 Name=JetBrains Toolbox
@@ -184,23 +175,23 @@ dnf5 install -y distrobox
 # at first boot below. This just gets Emacs + the tools Doom needs onto the image.
 dnf5 install -y emacs git ripgrep fd-find
 
-# Fonts
 # --- Install JetBrainsMono Nerd Font ---
 
 NERD_FONT_VERSION=$(curl -s https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | grep '"tag_name"' | cut -d '"' -f4)
 
-curl -Lo /tmp/JetBrainsMono.zip "https://github.com/ryanoasis/nerd-fonts/releases/download/${NERD_FONT_VERSION}/JetBrainsMono.zip"
+if [ -z "$NERD_FONT_VERSION" ]; then
+  echo "ERROR: Failed to resolve latest Nerd Fonts version (GitHub API rate-limited or unreachable)"
+  exit 1
+fi
 
-# Unzip into a system-wide fonts directory (not /usr/share/fonts/truetype,
-# which is Debian convention — Fedora just uses /usr/share/fonts/<name>)
+curl -Lfo /tmp/JetBrainsMono.zip "https://github.com/ryanoasis/nerd-fonts/releases/download/${NERD_FONT_VERSION}/JetBrainsMono.zip"
+
 mkdir -p /usr/share/fonts/jetbrainsmono-nerd-font
 unzip -o /tmp/JetBrainsMono.zip -d /usr/share/fonts/jetbrainsmono-nerd-font
 rm /tmp/JetBrainsMono.zip
 
-# Drop the .otf variants (keep .ttf only) to avoid duplicate font entries
 find /usr/share/fonts/jetbrainsmono-nerd-font -iname "*Windows Compatible*" -delete
 
-# Rebuild the font cache so the fonts are immediately available
 fc-cache -f
 
 # Multimedia Codecs
