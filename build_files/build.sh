@@ -183,7 +183,7 @@ StartupNotify=true
 EOF
 
 # Python
-sudo dnf install python3 python3-devel python3-pip python3-tkinter
+sudo dnf install -y python3 python3-devel python3-pip python3-tkinter
 
 # Distrobox
 dnf5 install -y distrobox
