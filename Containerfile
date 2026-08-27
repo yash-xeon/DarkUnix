@@ -20,6 +20,7 @@ FROM ghcr.io/ublue-os/base-main:latest
 # CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
 
 ### [IM]MUTABLE /opt
+RUN rm /opt && mkdir /opt
 ## Some bootable images, like Fedora, have /opt symlinked to /var/opt, in order to
 ## make it mutable/writable for users. However, some packages write files to this directory,
 ## thus its contents might be wiped out when bootc deploys an image, making it troublesome for
